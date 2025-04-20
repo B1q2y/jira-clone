@@ -18,22 +18,23 @@ import {
 } from '@/components/ui/form';
 import Link from 'next/link';
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, 'required'),
-});
+import { loginSchema } from '../schemas';
+import { useLogin } from '@/features/auth/api/use-login';
 
 export const SignInCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate } = useLogin();
+
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+    console.log('🔥 onSubmit values:', values);
+    mutate({ json: values });
   };
 
   return (
@@ -80,7 +81,12 @@ export const SignInCard = () => {
               )}
             />
 
-            <Button disabled={false} size="lg" className="w-full">
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              size="lg"
+              className="w-full"
+            >
               Login
             </Button>
           </form>
@@ -90,11 +96,21 @@ export const SignInCard = () => {
         <DottedSeparator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
-        <Button variant="secondary" size="lg" className="w-full">
+        <Button
+          disabled={false}
+          variant="secondary"
+          size="lg"
+          className="w-full"
+        >
           <FcGoogle className="mr-2 size-5" />
           Login with Google
         </Button>
-        <Button variant="secondary" size="lg" className="w-full">
+        <Button
+          disabled={false}
+          variant="secondary"
+          size="lg"
+          className="w-full"
+        >
           <FaGithub className="mr-2 size-5" />
           Login with Github
         </Button>

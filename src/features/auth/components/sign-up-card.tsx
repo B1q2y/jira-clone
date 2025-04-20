@@ -22,16 +22,14 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-
-const formSchema = z.object({
-  name: z.string().trim().min(1, 'required'),
-  email: z.string().email(),
-  password: z.string().min(8, 'Minimum of 8 characters required'),
-});
+import { registerSchema } from '../schemas';
+import { useRegister } from '../api/use-register';
 
 export const SignUpCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate } = useRegister();
+
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -39,9 +37,10 @@ export const SignUpCard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
+    mutate({ json: values });
   };
+
   return (
     <Card className="w-full h-full md:w-[487px] border-none shadow-none">
       <CardHeader className="flex items-center justify-center text-center p-7">
@@ -111,7 +110,11 @@ export const SignUpCard = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={false} size="lg" className="w-full">
+            <Button
+              disabled={form.formState.isSubmitting}
+              size="lg"
+              className="w-full"
+            >
               Login
             </Button>
           </form>
@@ -121,11 +124,21 @@ export const SignUpCard = () => {
         <DottedSeparator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
-        <Button variant="secondary" size="lg" className="w-full">
+        <Button
+          disabled={false}
+          variant="secondary"
+          size="lg"
+          className="w-full"
+        >
           <FcGoogle className="mr-2 size-5" />
           Login with Google
         </Button>
-        <Button variant="secondary" size="lg" className="w-full">
+        <Button
+          disabled={false}
+          variant="secondary"
+          size="lg"
+          className="w-full"
+        >
           <FaGithub className="mr-2 size-5" />
           Login with Github
         </Button>
